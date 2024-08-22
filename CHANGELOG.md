@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.0.13] - 2024-08-22
+
+### Changed
+
+- Upgraded hook to match new call signatures for SIWE provider canister functions. 
+- Upgraded dependencies, hook now requires at least v1.4.0 of @dfifnity libraries.
+- chore: Switched from npm to pnpm for package management.
+
 ## [0.0.11] - 2024-03-19
 
 ### Fixed

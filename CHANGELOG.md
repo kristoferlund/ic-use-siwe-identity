@@ -6,7 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [0.0.13] - 2024-08-22
+## [0.1.0] - 2024-08-22
+
+**This is a breaking change release**
+
+Minimum `ic_siwe_provider` canister required is v0.1.0.
+
+This version improves the security and reliability of the SIWE (Sign-In with Ethereum) process by ensuring proper cleanup of SIWE messages, implementing nonce-based security measures, and validating signature expiration. These changes help prevent replay attacks and ensure that expired signatures are not accepted.
+
+More info: https://github.com/kristoferlund/ic-siwe/releases/tag/v0.1.0
 
 ### Changed
 

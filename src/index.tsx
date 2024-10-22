@@ -6,6 +6,7 @@ import {
   useEffect,
   useState,
   useRef,
+  useCallback,
 } from "react";
 import { type ActorConfig, type HttpAgentOptions } from "@dfinity/agent";
 import { DelegationIdentity, Ed25519KeyIdentity } from "@dfinity/identity";
@@ -118,18 +119,19 @@ export function SiweIdentityProvider<T extends SIWE_IDENTITY_SERVICE>({
     error: signMessageError,
   } = useSignMessage();
 
+  const prepareLoginOkResponse = useRef<PrepareLoginOkResponse | undefined>(undefined);
+
   const [state, setState] = useState<State>({
     isInitializing: true,
     prepareLoginStatus: "idle",
     loginStatus: "idle",
   });
 
-  function updateState(newState: Partial<State>) {
-    setState((prevState) => ({
-      ...prevState,
-      ...newState,
-    }));
-  }
+  const updateState = useCallback((newState: Partial<State>) => {
+    setState((prevState) =>
+      ({ ...prevState, ...newState })
+    );
+  }, []);
 
   // Keep track of the promise handlers for the login method during the async login process.
   const loginPromiseHandlers = useRef<{
@@ -161,15 +163,16 @@ export function SiweIdentityProvider<T extends SIWE_IDENTITY_SERVICE>({
     });
 
     try {
-      const prepareLoginOkResponse = await callPrepareLogin(
+      const response = await callPrepareLogin(
         state.anonymousActor,
         connectedEthAddress
       );
       updateState({
-        prepareLoginOkResponse,
+        prepareLoginOkResponse: response,
         prepareLoginStatus: "success",
       });
-      return prepareLoginOkResponse;
+      prepareLoginOkResponse.current = response;
+      return response;
     } catch (e) {
       const error = normalizeError(e);
       console.error(error);
@@ -227,7 +230,7 @@ export function SiweIdentityProvider<T extends SIWE_IDENTITY_SERVICE>({
       return;
     }
 
-    if (!state.prepareLoginOkResponse) {
+    if (!prepareLoginOkResponse.current) {
       rejectLoginWithError(new Error("Prepare login not called."));
       return;
     }
@@ -242,7 +245,7 @@ export function SiweIdentityProvider<T extends SIWE_IDENTITY_SERVICE>({
         loginSignature,
         connectedEthAddress,
         sessionPublicKey,
-        state.prepareLoginOkResponse.nonce
+        prepareLoginOkResponse.current.nonce
       );
     } catch (e) {
       rejectLoginWithError(e, "Unable to login.");
@@ -375,6 +378,7 @@ export function SiweIdentityProvider<T extends SIWE_IDENTITY_SERVICE>({
       identityAddress: undefined,
       delegationChain: undefined,
     });
+    prepareLoginOkResponse.current = undefined;
     clearIdentity();
   }
 
@@ -398,7 +402,7 @@ export function SiweIdentityProvider<T extends SIWE_IDENTITY_SERVICE>({
         isInitializing: false,
       });
     }
-  }, []);
+  }, [updateState]);
 
   /**
    * On address change, reset the state. Action is conditional on state.isInitializing
@@ -424,7 +428,7 @@ export function SiweIdentityProvider<T extends SIWE_IDENTITY_SERVICE>({
     updateState({
       anonymousActor: a,
     });
-  }, [idlFactory, canisterId, httpAgentOptions, actorOptions]);
+  }, [idlFactory, canisterId, httpAgentOptions, actorOptions, updateState]);
 
   return (
     <SiweIdentityContext.Provider

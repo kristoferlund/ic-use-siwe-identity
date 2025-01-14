@@ -1,5 +1,8 @@
 import { DelegationChain, DelegationIdentity } from "@dfinity/identity";
-import type { LoginStatus, PrepareLoginStatus } from "./state.type";
+
+export type PrepareLoginStatus = "error" | "preparing" | "success" | "idle";
+export type LoginStatus = "error" | "logging-in" | "success" | "idle";
+export type SignMessageStatus = "error" | "idle" | "pending" | "success";
 
 export type SiweIdentityContextType = {
   /** Is set to `true` on mount until a stored identity is loaded from local storage or
@@ -49,13 +52,11 @@ export type SiweIdentityContextType = {
   /** Error that occurred during the login process. */
   loginError?: Error;
 
-  /** Status of the SIWE message signing process. This is a re-export of the Wagmi
-   * signMessage / status type. */
-  signMessageStatus: "error" | "idle" | "pending" | "success";
+  /** Status of the SIWE message signing process. */
+  signMessageStatus: SignMessageStatus;
 
-  /** Error that occurred during the SIWE message signing process. This is a re-export of the
-   * Wagmi signMessage / error type. */
-  signMessageError: Error | null;
+  /** Error that occurred during the SIWE message signing process. */
+  signMessageError?: Error;
 
   /** The delegation chain is available after successfully loading the identity from local
    * storage or completing the login process. */

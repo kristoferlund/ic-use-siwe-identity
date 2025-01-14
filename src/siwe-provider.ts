@@ -13,7 +13,7 @@ import type { SIWE_IDENTITY_SERVICE } from "./service.interface";
  * Creates an anonymous actor for interactions with the Internet Computer.
  * This is used primarily for the initial authentication process.
  */
-export function createAnonymousActor({
+export async function createAnonymousActor({
   idlFactory,
   canisterId,
   httpAgentOptions,
@@ -24,18 +24,11 @@ export function createAnonymousActor({
   httpAgentOptions?: HttpAgentOptions;
   actorOptions?: ActorConfig;
 }) {
-  if (!idlFactory || !canisterId) return;
-  const agent = new HttpAgent({ ...httpAgentOptions });
-
-  if (process.env.DFX_NETWORK !== "ic") {
-    agent.fetchRootKey().catch((err) => {
-      console.warn(
-        "Unable to fetch root key. Check to ensure that your local replica is running"
-      );
-      console.error(err);
-    });
-  }
-
+  const shouldFetchRootKey = process.env.DFX_NETWORK !== "ic";
+  const agent = await HttpAgent.create({
+    ...httpAgentOptions,
+    shouldFetchRootKey,
+  });
   return Actor.createActor<SIWE_IDENTITY_SERVICE>(idlFactory, {
     agent,
     canisterId,
@@ -45,7 +38,7 @@ export function createAnonymousActor({
 
 export async function callPrepareLogin(
   anonymousActor: ActorSubclass<SIWE_IDENTITY_SERVICE>,
-  address: `0x${string}` | undefined
+  address: `0x${string}` | undefined,
 ) {
   if (!anonymousActor || !address) {
     throw new Error("Invalid actor or address");
@@ -68,7 +61,7 @@ export async function callLogin(
   data: `0x${string}` | undefined,
   address: `0x${string}` | undefined,
   sessionPublicKey: DerEncodedPublicKey,
-  nonce: string
+  nonce: string,
 ) {
   if (!anonymousActor || !data || !address) {
     throw new Error("Invalid actor, data or address");
@@ -78,7 +71,7 @@ export async function callLogin(
     data,
     address,
     new Uint8Array(sessionPublicKey),
-    nonce
+    nonce,
   );
 
   if ("Err" in loginReponse) {
@@ -95,7 +88,7 @@ export async function callGetDelegation(
   anonymousActor: ActorSubclass<SIWE_IDENTITY_SERVICE>,
   address: `0x${string}` | undefined,
   sessionPublicKey: DerEncodedPublicKey,
-  expiration: bigint
+  expiration: bigint,
 ) {
   if (!anonymousActor || !address) {
     throw new Error("Invalid actor or address");
@@ -104,7 +97,7 @@ export async function callGetDelegation(
   const response = await anonymousActor.siwe_get_delegation(
     address,
     new Uint8Array(sessionPublicKey),
-    expiration
+    expiration,
   );
 
   if ("Err" in response) {

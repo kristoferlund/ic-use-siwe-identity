@@ -1,5 +1,5 @@
 > [!IMPORTANT]
-> This repository has been moved to the main [ic-siwe](https://github.com/kristoferlund/ic-siwe) monorepo. In addition to that, the package on npm has been renamed to `ic-siwe-js`. Please update your dependencies to use the new package name.
+> This repository has been moved to the main [ic-siwe](https://github.com/kristoferlund/ic-siwe) monorepo. In addition to that, the package on npm has been renamed to [ic-siwe-js](https://www.npmjs.com/package/ic-siwe-js). Please update your dependencies to use the new package name.
 
 ![Sign in with Ethereum for the Internet Computer](/media/header.png)
 

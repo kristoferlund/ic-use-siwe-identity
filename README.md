@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> This repository has been moved to the main [ic-siwe](https://github.com/kristoferlund/ic-siwe) monorepo. In addition to that, the package on npm has been renamed to `ic-siwe-js`. Please update your dependencies to use the new package name.
+
 ![Sign in with Ethereum for the Internet Computer](/media/header.png)
 
 `ic-use-siwe-identity` is a React hook and context provider for easy frontend integration with SIWE enabled [Internet Computer](https://internetcomputer.org) canisters.
